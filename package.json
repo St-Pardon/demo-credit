@@ -1,0 +1,34 @@
+{
+  "name": "demo-credit",
+  "version": "1.0.0",
+  "description": "a simple ewallaet application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/St-Pardon/d-credit.git"
+  },
+  "keywords": [
+    "ewallet",
+    "banking",
+    "credit"
+  ],
+  "author": "onyedikachi onu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/St-Pardon/d-credit/issues"
+  },
+  "homepage": "https://github.com/St-Pardon/d-credit#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0"
+  }
+}
