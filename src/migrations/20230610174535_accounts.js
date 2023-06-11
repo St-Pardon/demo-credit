@@ -3,16 +3,18 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  knex.schema.createTable('accounts', (table) => {
-    table.increments('id').primary();
+  return knex.schema.createTable('accounts', (table) => {
+    table.string('account_id').primary();
     table.string('account_no').notNullable();
-    table.string('account_type').notNullable();
+    table
+      .enum('account_type', ['savings', 'current', 'domicile', 'fixed deposit'])
+      .defaultTo('savings')
+      .notNullable();
     table.decimal('balance', 10, 2).notNullable().defaultTo(0);
     table
-      .integer('user_id')
-      .unsigned()
+      .string('user_id')
       .notNullable()
-      .references('id')
+      .references('user_id')
       .inTable('users');
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
@@ -24,5 +26,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  knex.schema.dropTableIfExists('accounts');
+  return knex.schema.dropTableIfExists('accounts');
 };
