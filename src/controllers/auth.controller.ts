@@ -6,9 +6,10 @@ import { JWT_SECRET } from '../config/env.config';
 class AuthController {
   /**
    * Authenticate user by signin
-   * @param req
-   * @param res
-   * @param next
+   * @param {Request} req - Request object
+   * @param {Response} res - Response object
+   * @param {NextFunction} next - Function
+   * @returns {Promise<void>}
    */
   static async signin(
     req: Request,
@@ -41,9 +42,10 @@ class AuthController {
 
   /**
    * creates a new user account
-   * @param req
-   * @param res
-   * @param next
+   * @param {Request} req - the request object
+   * @param {Response} res - the response object
+   * @param {NextFunction} next - the next function
+   * @returns {Promise<void>} Promise
    */
   static async signup(
     req: Request,

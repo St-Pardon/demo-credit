@@ -5,6 +5,12 @@ import generateAccountNumbers from '../utils/generatenum.utils';
 import { AccountInfo } from '../utils/types.utils';
 
 class AccountController {
+  /**
+   * create a new account
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async create(
     req: Request & { user?: any },
     res: Response
@@ -34,6 +40,12 @@ class AccountController {
     }
   }
 
+  /**
+   * fund an account
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async fund(
     req: Request & { user?: any },
     res: Response
@@ -53,6 +65,12 @@ class AccountController {
     res.status(200).json({ msg: 'fund deposited' });
   }
 
+  /**
+   * retrieve balance of an account
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async balance(
     req: Request & { user?: any },
     res: Response
@@ -72,6 +90,12 @@ class AccountController {
     res.status(200).json(balance);
   }
 
+  /**
+   * retrieve an accounts information
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async accountInfo(
     req: Request & { user?: any },
     res: Response
@@ -90,6 +114,12 @@ class AccountController {
     res.status(200).json(balance);
   }
 
+  /**
+   * retrieve all accounts from a user
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async userAccounts(
     req: Request & { user?: any },
     res: Response
@@ -104,6 +134,12 @@ class AccountController {
     res.status(200).json(balance);
   }
 
+  /**
+   * transfer fund between accounts
+   * @param {Request} req  Request object
+   * @param {Response} res Response object
+   * @returns {Promise<void>}
+   */
   static async transfer(
     req: Request & { user?: any },
     res: Response
