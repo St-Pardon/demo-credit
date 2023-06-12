@@ -34,7 +34,143 @@ class AccountController {
     }
   }
 
-  static async fund(req: Request, res: Response): Promise<void> {}
+  static async fund(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { account_no, balance } = req.body;
+
+    const update = await database('accounts')
+      .where('account_no', parseInt(account_no))
+      .increment('balance', parseFloat(balance))
+      .update({ updated_at: new Date() });
+
+    if (!update) {
+      res.status(400).json({ err: 'transaction failed' });
+      return;
+    }
+
+    res.status(200).json({ msg: 'fund deposited' });
+  }
+
+  static async balance(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { account_no = 0 } = req.query;
+    const { user_id } = req.user;
+
+    const balance = await database('accounts')
+      .select('balance')
+      .where({ account_no: parseInt(account_no.toString()), user_id })
+      .first();
+
+    if (!balance) {
+      res.status(400).json({ err: 'Cannot get balance, Try again later' });
+    }
+
+    res.status(200).json(balance);
+  }
+
+  static async accountInfo(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { account_no = 0 } = req.query;
+    const { user_id } = req.user;
+
+    const balance = await database('accounts')
+      .where({ account_no: parseInt(account_no.toString()), user_id })
+      .first();
+
+    if (!balance) {
+      res.status(400).json({ err: 'Cannot get balance, Try again later' });
+    }
+
+    res.status(200).json(balance);
+  }
+
+  static async userAccounts(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { user_id } = req.user;
+
+    const balance = await database('accounts').where({ user_id });
+    if (!balance) {
+      res.status(400).json({ err: 'Cannot get balance, Try again later' });
+    }
+
+    res.status(200).json(balance);
+  }
+
+  static async transfer(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { senderAccount, recipientAccount, amount, comment } = req.body;
+
+    await database.transaction(async (trx) => {
+      try {
+        await database('accounts')
+          .transacting(trx)
+          .where('account_no', parseInt(senderAccount))
+          .decrement('balance', parseFloat(amount))
+          .update({ updated_at: new Date() });
+        await database('accounts')
+          .transacting(trx)
+          .where('account_no', parseInt(recipientAccount))
+          .increment('balance', parseFloat(amount))
+          .update({ updated_at: new Date() });
+
+        const data = {
+          transaction_id: uuidv4(),
+          to: recipientAccount,
+          from: senderAccount,
+          amount,
+          comment,
+          status: 'successful',
+        };
+
+        await database('transactions')
+          .transacting(trx)
+          .insert({
+            id: uuidv4(),
+            transaction_type: 'debit',
+            description: `Fund transfer from ${senderAccount} to ${recipientAccount}`,
+            ...data,
+          });
+        await database('transactions')
+          .transacting(trx)
+          .insert({
+            id: uuidv4(),
+            transaction_type: 'credit',
+            description: `Fund transfer from ${senderAccount} to ${recipientAccount}`,
+            ...data,
+          });
+
+        await trx.commit();
+
+        res.status(200).json({ msg: 'Transaction Successful' });
+      } catch (error) {
+        console.error('Transaction failed:', error);
+        await trx.rollback();
+
+        await database('transactions').insert({
+          id: uuidv4(),
+          transaction_type: 'debit',
+          description: `Fund transfer from ${senderAccount} to ${recipientAccount}`,
+          transaction_id: uuidv4(),
+          to: recipientAccount,
+          from: senderAccount,
+          amount,
+          comment,
+          status: 'failed',
+        });
+        res.status(400).json({ msg: 'Transaction Failed' });
+      }
+    });
+  }
 }
 
 export default AccountController;
