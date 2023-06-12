@@ -1,0 +1,10 @@
+PORT=5432
+CLIENT="mysql2"
+DBUSER=database_user
+PASSWORD=database_password"
+DATABASE=database_name
+NODE_ENV='development'
+JWT_SECRET=your_jwt_secret
+
+
+# JWT_SECRET should contain a random string to encrypt and sign your JWT.
