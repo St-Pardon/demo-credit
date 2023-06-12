@@ -50,19 +50,36 @@ class AccountController {
     req: Request & { user?: any },
     res: Response
   ): Promise<void> {
-    const { account_no, balance } = req.body;
+    const { account_no, amount, comment } = req.body;
+    const transaction_id = uuidv4();
 
-    const update = await database('accounts')
-      .where('account_no', parseInt(account_no))
-      .increment('balance', parseFloat(balance))
-      .update({ updated_at: new Date() });
+    await database.transaction(async (trx) => {
+      try {
+        await database('accounts')
+          .transacting(trx)
+          .where('account_no', parseInt(account_no))
+          .increment('balance', parseFloat(amount))
+          .update({ updated_at: new Date() });
 
-    if (!update) {
-      res.status(400).json({ err: 'transaction failed' });
-      return;
-    }
+        await database('transactions')
+          .transacting(trx)
+          .insert({
+            id: uuidv4(),
+            transaction_type: 'credit',
+            description: `Fund deposit to ${account_no}`,
+            transaction_id,
+            to: account_no,
+            amount,
+            comment,
+          });
 
-    res.status(200).json({ msg: 'fund deposited' });
+        await trx.commit();
+
+        res.status(200).json({ msg: 'Deposit Successful', transaction_id });
+      } catch (error) {
+        res.status(400).json({ msg: 'Deposit Failed' });
+      }
+    });
   }
 
   /**
@@ -145,6 +162,7 @@ class AccountController {
     res: Response
   ): Promise<void> {
     const { senderAccount, recipientAccount, amount, comment } = req.body;
+    const transaction_id = uuidv4();
 
     await database.transaction(async (trx) => {
       try {
@@ -153,6 +171,7 @@ class AccountController {
           .where('account_no', parseInt(senderAccount))
           .decrement('balance', parseFloat(amount))
           .update({ updated_at: new Date() });
+
         await database('accounts')
           .transacting(trx)
           .where('account_no', parseInt(recipientAccount))
@@ -160,7 +179,7 @@ class AccountController {
           .update({ updated_at: new Date() });
 
         const data = {
-          transaction_id: uuidv4(),
+          transaction_id,
           to: recipientAccount,
           from: senderAccount,
           amount,
@@ -176,6 +195,7 @@ class AccountController {
             description: `Fund transfer from ${senderAccount} to ${recipientAccount}`,
             ...data,
           });
+
         await database('transactions')
           .transacting(trx)
           .insert({
@@ -187,9 +207,10 @@ class AccountController {
 
         await trx.commit();
 
-        res.status(200).json({ msg: 'Transaction Successful' });
+        res.status(200).json({ msg: 'Transaction Successful', transaction_id });
       } catch (error) {
         console.error('Transaction failed:', error);
+
         await trx.rollback();
 
         await database('transactions').insert({
@@ -203,7 +224,44 @@ class AccountController {
           comment,
           status: 'failed',
         });
-        res.status(400).json({ msg: 'Transaction Failed' });
+
+        res.status(400).json({ msg: 'Transaction Failed', transaction_id });
+      }
+    });
+  }
+
+  static async withdraw(
+    req: Request & { user?: any },
+    res: Response
+  ): Promise<void> {
+    const { account_no, amount, comment } = req.body;
+    const transaction_id = uuidv4();
+
+    await database.transaction(async (trx) => {
+      try {
+        await database('accounts')
+          .transacting(trx)
+          .where('account_no', parseInt(account_no))
+          .decrement('balance', parseFloat(amount))
+          .update({ updated_at: new Date() });
+
+        await database('transactions')
+          .transacting(trx)
+          .insert({
+            id: uuidv4(),
+            transaction_type: 'debit',
+            description: `Fund withrawal from ${account_no}`,
+            transaction_id,
+            from: account_no,
+            amount,
+            comment,
+          });
+
+        await trx.commit();
+
+        res.status(200).json({ msg: 'Withdrawal Successful', transaction_id });
+      } catch (error) {
+        res.status(400).json({ msg: 'Withdrawal Failed' });
       }
     });
   }

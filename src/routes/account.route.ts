@@ -7,8 +7,8 @@ AccountRoute.get('/create', AccountController.create)
   .get('/balance', AccountController.balance)
   .get('/account-info', AccountController.accountInfo)
   .get('/user-accounts', AccountController.userAccounts)
-  .put('/fund', AccountController.fund)
   .put('/transfer', AccountController.transfer)
-  .patch('/withdraw');
+  .put('/fund', AccountController.fund)
+  .put('/withdraw', AccountController.withdraw);
 
 export default AccountRoute;
