@@ -1,16 +1,11 @@
-import { Request, Response, Router } from 'express';
-import database from '../config/db.config';
+import { Router } from 'express';
+import UserController from '../controllers/user.controller';
 
 const UserRoute = Router();
 
-UserRoute.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const users = await database('users').select('*');
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error retrieving users:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+UserRoute.get('/', UserController.getInfo)
+  .get('/:user_id', UserController.getUser)
+  .patch('/', UserController.updateInfo)
+  .delete('/', UserController.deleteInfo);
 
 export default UserRoute;
