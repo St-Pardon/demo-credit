@@ -6,7 +6,8 @@ import { Knex } from 'knex';
  */
 export async function up(knex: Knex): Promise<void> {
   return await knex.schema.createTable('transactions', (table) => {
-    table.uuid('transaction_id').primary();
+    table.uuid('id').primary();
+    table.uuid('transaction_id').notNullable();
     table.enum('transaction_type', ['debit', 'credit']).notNullable();
     table.enum('status', ['successful', 'failed', 'cancelled']).notNullable();
     table.decimal('amount', 10, 2).notNullable();
