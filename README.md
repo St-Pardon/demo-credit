@@ -17,7 +17,7 @@ A simple lending app with wallet functionality.
 - [Tools](#tools)
 - [Getting Started](#getting-started)
   - [Prerequisites]()
-  - [Setup](#setup)
+  - [Set Up](#setup)
 - [API Documentation](#api-documentation)
 - [Deployment](#deployment)
 - [Author(s)](#authors)
@@ -48,8 +48,9 @@ The following tools were used in actualizing this project
 - **IDE/Text editor:** Visual Code, VI
 - **Source Control and Repository:** Git and Github
 - **Language(s) and Framework(s):** TypeScript, Express, Node.
-- **Librabries:** Knexjs, Passportjs, helmet, bcrypt and uuid.
+- **Libraries:** Knexjs, Passportjs, helmet, bcrypt and uuid.
 - **Database:** MySQL
+- **Testing:** Jest, Supertest, ThunderClient, Postman
 - **Hosting:**
 - **Others:** DrawSql, zsh terminal,
 
@@ -67,7 +68,7 @@ To run this project, the following tools must be installed on your machine:
 - API Platform: Application, extention or web base API Platform will do. check out [Postman](https://www.postman.com/) and [ThunderClient](https://www.thunderclient.com/)
 - MySQL: if not already installed, install from [here](https://www.mysql.com/)
 
-### Setup
+### Set Up
 
 **`Step 1:`** Open your terminal on your computer and clone the code [repository](https://github.com/St-Pardon/demo-credit.git).
 
