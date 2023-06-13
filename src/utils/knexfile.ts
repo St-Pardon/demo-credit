@@ -15,6 +15,18 @@ const config = {
       directory: '../migrations',
     },
   },
+  
+  test: {
+    client: CLIENT,
+    connection: {
+      user: USER,
+      password: PASSWORD,
+      database: 'testdb',
+    },
+    migrations: {
+      directory: './src/migrations',
+    },
+  },
 
   staging: {
     client: 'postgresql',
