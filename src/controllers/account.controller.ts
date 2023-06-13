@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import database from '../config/db.config';
 import generateAccountNumbers from '../utils/generatenum.utils';
 import { AccountInfo } from '../utils/types.utils';
+import { verifyAccount } from '../utils/transaction.utils';
 
 class AccountController {
   /**
@@ -51,13 +52,23 @@ class AccountController {
     res: Response
   ): Promise<void> {
     const { account_no, amount, comment } = req.body;
+    const { user_id } = req.user;
     const transaction_id = uuidv4();
+
+    if (!(await verifyAccount(account_no, user_id))) {
+      res.status(400).json({
+        err: 'Invalid account number',
+        reason: 'account do not exist or belong to this user',
+      });
+      return;
+    }
 
     await database.transaction(async (trx) => {
       try {
         await database('accounts')
           .transacting(trx)
-          .where('account_no', parseInt(account_no))
+          .where({ account_no: parseInt(account_no) })
+          .andWhere({ user_id })
           .increment('balance', parseFloat(amount))
           .update({ updated_at: new Date() });
 
@@ -102,6 +113,7 @@ class AccountController {
 
     if (!balance) {
       res.status(400).json({ err: 'Cannot get balance, Try again later' });
+      return;
     }
 
     res.status(200).json(balance);
@@ -120,15 +132,24 @@ class AccountController {
     const { account_no = 0 } = req.query;
     const { user_id } = req.user;
 
-    const balance = await database('accounts')
+    if (!(await verifyAccount(parseInt(account_no.toString()), user_id))) {
+      res.status(400).json({
+        err: 'Invalid account number',
+        reason: 'account do not exist or belong to this user',
+      });
+      return;
+    }
+
+    const info = await database('accounts')
       .where({ account_no: parseInt(account_no.toString()), user_id })
       .first();
 
-    if (!balance) {
+    if (!info) {
       res.status(400).json({ err: 'Cannot get balance, Try again later' });
+      return;
     }
 
-    res.status(200).json(balance);
+    res.status(200).json(info);
   }
 
   /**
@@ -143,12 +164,15 @@ class AccountController {
   ): Promise<void> {
     const { user_id } = req.user;
 
-    const balance = await database('accounts').where({ user_id });
-    if (!balance) {
+    const accounts = await database('accounts').where({
+      user_id,
+    });
+    if (!accounts) {
       res.status(400).json({ err: 'Cannot get balance, Try again later' });
+      return;
     }
 
-    res.status(200).json(balance);
+    res.status(200).json(accounts);
   }
 
   /**
@@ -162,13 +186,21 @@ class AccountController {
     res: Response
   ): Promise<void> {
     const { senderAccount, recipientAccount, amount, comment } = req.body;
+    const { user_id } = req.user;
     const transaction_id = uuidv4();
+
+    if (!(await verifyAccount(senderAccount, user_id))) {
+      res.status(400).json({
+        err: 'Invalid account number',
+        reason: 'account do not exist or belong to this user',
+      });
+    }
 
     await database.transaction(async (trx) => {
       try {
         await database('accounts')
           .transacting(trx)
-          .where('account_no', parseInt(senderAccount))
+          .where({ account_no: parseInt(senderAccount) })
           .decrement('balance', parseFloat(amount))
           .update({ updated_at: new Date() });
 
@@ -235,13 +267,21 @@ class AccountController {
     res: Response
   ): Promise<void> {
     const { account_no, amount, comment } = req.body;
+    const { user_id } = req.user;
     const transaction_id = uuidv4();
+
+    if (!(await verifyAccount(account_no, user_id))) {
+      res.status(400).json({
+        err: 'Invalid account number',
+        reason: 'account do not exist or belong to this user',
+      });
+    }
 
     await database.transaction(async (trx) => {
       try {
         await database('accounts')
           .transacting(trx)
-          .where('account_no', parseInt(account_no))
+          .where({ account_no: parseInt(account_no), user_id })
           .decrement('balance', parseFloat(amount))
           .update({ updated_at: new Date() });
 
