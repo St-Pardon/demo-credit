@@ -116,7 +116,7 @@ npm run start:dev
 **`Step 7:`** Congratulation you have successfully started the application and now open your API Platform and test out the end points. To carefully expore and understand the endpoints see [API Documentation](#api-documentation) to get a list and demo of all the available endpoints and how to use them.
 ## API Documentation
 
-The API Documentation is live on [Postman](https://documenter.getpostman.com/view/18352130/2s93sf2BM2). This contain the full list of the endpoints, their methods and some examples.
+The API Documentation is live on [Postman](https://documenter.getpostman.com/view/18352130/2s93sf2WNU). This contain the full list of the endpoints, their methods and some examples.
 
 ## Deployment
 
