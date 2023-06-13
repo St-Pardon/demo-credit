@@ -55,6 +55,13 @@ class AccountController {
     const { user_id } = req.user;
     const transaction_id = uuidv4();
 
+    if (!account_no || !amount) {
+      res.status(400).json({
+        err: 'Provided amount and account information',
+      });
+      return;
+    }
+
     if (!(await verifyAccount(account_no, user_id))) {
       res.status(400).json({
         err: 'Invalid account number',
@@ -106,13 +113,22 @@ class AccountController {
     const { account_no = 0 } = req.query;
     const { user_id } = req.user;
 
+    if (!account_no) {
+      res.status(400).json({
+        err: 'Provided account information',
+      });
+      return;
+    }
+
     const balance = await database('accounts')
       .select('balance')
       .where({ account_no: parseInt(account_no.toString()), user_id })
       .first();
 
     if (!balance) {
-      res.status(400).json({ err: 'Cannot get balance, Try again later' });
+      res
+        .status(400)
+        .json({ err: 'Cannot get balance for this account, Try again later' });
       return;
     }
 
@@ -131,6 +147,13 @@ class AccountController {
   ): Promise<void> {
     const { account_no = 0 } = req.query;
     const { user_id } = req.user;
+
+    if (!account_no) {
+      res.status(400).json({
+        err: 'Provided account information',
+      });
+      return;
+    }
 
     if (!(await verifyAccount(parseInt(account_no.toString()), user_id))) {
       res.status(400).json({
@@ -269,6 +292,13 @@ class AccountController {
     const { account_no, amount, comment } = req.body;
     const { user_id } = req.user;
     const transaction_id = uuidv4();
+
+    if (!account_no || !amount) {
+      res.status(400).json({
+        err: 'Provided amount and account information',
+      });
+      return;
+    }
 
     if (!(await verifyAccount(account_no, user_id))) {
       res.status(400).json({
