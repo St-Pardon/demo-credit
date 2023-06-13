@@ -20,9 +20,11 @@ class AuthController {
       try {
         if (err) {
           res.status(403).json({ error: 'Email or password is incorrect' });
+          return;
         }
         if (!user) {
           res.status(404).json({ error: 'User do not exist' });
+          return;
         }
         req.login(user, { session: false }, async (error) => {
           if (error) return next(error);
@@ -30,9 +32,7 @@ class AuthController {
           const token = jwt.sign({ user: body }, JWT_SECRET, {
             expiresIn: '24h',
           });
-          return res
-            .status(200)
-            .json({ message: 'Signin successful', token, body });
+          res.status(200).json({ message: 'Signin successful', token, body });
         });
       } catch (error) {
         return next(error);
@@ -52,13 +52,16 @@ class AuthController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    passport.authenticate('signup', async (err: any, user: any) => {
+    passport.authenticate('signup', async (err: any, user: any, msg: any) => {
       if (err) {
-        res.status(500).send(err);
+        res.status(403).json({
+          msg: 'error creating user',
+          reason: 'missing required fields',
+        });
         return;
       }
       if (!user) {
-        res.status(403).json({ err: 'User already exist' });
+        res.status(403).json(msg || { err: 'User already exist' });
         return;
       }
       res.status(201).json({ msg: 'signup successful', user });

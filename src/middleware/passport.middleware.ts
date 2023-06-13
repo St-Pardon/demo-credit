@@ -42,6 +42,12 @@ passport
       async (req, email, password, done) => {
         try {
           const data: Req = req.body;
+          if (!data.first_name && !data.last_name) {
+            return done(true, false, {
+              message: 'Please provide all required information',
+            });
+          }
+
           const checkMail = await database('users')
             .select('email')
             .where('email', email);
@@ -67,7 +73,7 @@ passport
           };
           return done(null, user);
         } catch (error) {
-          return done(error);
+          return done(error, false, { message: 'error creating user'});
         }
       }
     )
