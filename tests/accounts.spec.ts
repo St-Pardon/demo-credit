@@ -1,11 +1,14 @@
 import request from 'supertest';
-import { clearDatabase, seedDatabase, testDb } from './test-config';
+import { clearDatabase, createDatabase, seedDatabase, testDb } from './test-config';
 import app from '../src/app';
 
 describe('creation of transaction accounts', () => {
   let token: string;
 
   beforeAll(async () => {
+    // Create database
+    await createDatabase()
+
     // Clear the test database
     await clearDatabase(testDb);
 
@@ -29,7 +32,8 @@ describe('creation of transaction accounts', () => {
 
   afterAll(async () => {
     // Close the test database connection
-    await testDb.destroy();
+    await testDb.raw('DROP DATABASE testdb');
+    await testDb.client.destroy();
   });
 
   it('should create a transaction account', async () => {

@@ -1,5 +1,10 @@
 import request from 'supertest';
-import { clearDatabase, seedDatabase, testDb } from './test-config';
+import {
+  clearDatabase,
+  createDatabase,
+  seedDatabase,
+  testDb,
+} from './test-config';
 import app from '../src/app';
 
 describe('Test basic transactions, deposit, transfer and fund account', () => {
@@ -12,6 +17,9 @@ describe('Test basic transactions, deposit, transfer and fund account', () => {
   let user3: user;
   let token: string;
   beforeAll(async () => {
+    // Create database
+    await createDatabase();
+
     // Clear the test database
     await clearDatabase(testDb);
 
@@ -82,7 +90,8 @@ describe('Test basic transactions, deposit, transfer and fund account', () => {
 
   afterAll(async () => {
     // Close the test database connection
-    await testDb.destroy();
+    await testDb.raw('DROP DATABASE testdb');
+    await testDb.client.destroy();
   });
 
   /**

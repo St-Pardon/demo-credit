@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dbConfig from '../src/utils/knexfile';
 import { encryptPassword } from '../src/utils/hashpassword.utils';
 import generateAccountNumbers from '../src/utils/generatenum.utils';
+import { CLIENT, PASSWORD, USER } from '../src/config/env.config';
 
 export const testDb = knex(dbConfig['test']);
 
@@ -63,10 +64,32 @@ export async function seedDatabase(db: Knex): Promise<void> {
       account_type: 'savings',
     },
   ]);
-
-  // ... repeat for other tables
 }
 
 export async function migrateLatest(db: Knex): Promise<void> {
   await db.migrate.latest();
+}
+
+const testConfig = {
+  client: CLIENT,
+  connection: {
+    host: 'localhost',
+    user: USER,
+    password: PASSWORD,
+  },
+};
+
+const database = knex(testConfig);
+
+/**
+ * creates database if not already created and returns connection status
+ */
+export async function createDatabase() {
+  try {
+    await database.raw('CREATE DATABASE IF NOT EXISTS testdb');
+  } catch (error) {
+    console.error('Error creating database:', error);
+  } finally {
+    database.destroy();
+  }
 }
