@@ -15,7 +15,7 @@ const config = {
       directory: '../migrations',
     },
   },
-  
+
   test: {
     client: CLIENT,
     connection: {
@@ -45,12 +45,8 @@ const config = {
   },
 
   production: {
-    client: 'postgresql',
-    connection: {
-      database: DATABASE,
-      user: USER,
-      password: PASSWORD,
-    },
+    client: 'pg',
+    connection: 'postgres://root:ZztanWEO4ZRkTAbAZjtA6vYI18XL0NEn@dpg-ci45tctiuie031g8tl70-a/dcredit',
     pool: {
       min: 2,
       max: 10,
