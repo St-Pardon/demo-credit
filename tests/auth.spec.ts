@@ -89,7 +89,7 @@ describe('Authenticate User', () => {
     expect(res.body.user.last_name).toBe('gerald');
   });
 
-  it("shouldn't SignUp a user without an", async () => {
+  it("shouldn't SignUp a user without any field", async () => {
     const res = await request(app)
       .post('/auth/signup')
       .set('content-type', 'application/json')
@@ -99,7 +99,72 @@ describe('Authenticate User', () => {
         password: await encryptPassword('stevegerald'),
       });
 
-    console.log(res.body);
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
+    expect(res.body.message).toBe('Missing credentials');
+  });
+
+  it("shouldn't SignUp a user without an email", async () => {
+    const res = await request(app)
+      .post('/auth/signup')
+      .set('content-type', 'application/json')
+      .send({
+        first_name: 'steve',
+        last_name: 'gerald',
+        password: await encryptPassword('stevegerald'),
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
+    expect(res.body.message).toBe('Missing credentials');
+  });
+
+  it("shouldn't SignUp a user without a password", async () => {
+    const res = await request(app)
+      .post('/auth/signup')
+      .set('content-type', 'application/json')
+      .send({
+        first_name: 'steve',
+        last_name: 'gerald',
+        password: await encryptPassword('stevegerald'),
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
+    expect(res.body.message).toBe('Missing credentials');
+  });
+
+  it("shouldn't SignUp a user without a first name", async () => {
+    const res = await request(app)
+      .post('/auth/signup')
+      .set('content-type', 'application/json')
+      .send({
+        last_name: 'gerald',
+        email: 'steve1@gerald.com',
+        password: await encryptPassword('stevegerald'),
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('msg');
+    expect(res.body).toHaveProperty('reason');
+    expect(res.body.msg).toBe('error creating user');
+    expect(res.body.reason).toBe('missing required fields');
+  });
+
+  it("shouldn't SignUp a user without a last name", async () => {
+    const res = await request(app)
+      .post('/auth/signup')
+      .set('content-type', 'application/json')
+      .send({
+        first_name: 'steve',
+        email: 'steve1@gerald.com',
+        password: await encryptPassword('stevegerald'),
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('msg');
+    expect(res.body).toHaveProperty('reason');
+    expect(res.body.msg).toBe('error creating user');
+    expect(res.body.reason).toBe('missing required fields');
   });
 });
