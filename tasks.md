@@ -16,7 +16,7 @@ You are required to build an MVP (Minimum viable product)  wallet service
 - [x] A readme design document for your implementation
 - [x] An implementation of the project (NodeJS API using TypeScript)
 - [x] You may not bother about building a full authentication system, a faux token based authentication will suffice.
-- [ ] Ensure to write unit tests for the project
+- [x] Ensure to write unit tests for the project
 
 ### Tech Stack
 - [x] NodeJS (LTS version)
